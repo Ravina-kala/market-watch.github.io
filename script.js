@@ -114,6 +114,8 @@ function plotGraph() {
         // Layout for the chart
         const layout = {
             title: `Stock Data for ${tick}`,
+            // width: 800,
+            height: 800,
             grid: {
                 rows: 3,
                 columns: 1,
@@ -127,17 +129,17 @@ function plotGraph() {
             },
             yaxis1: {
                 title: 'Price',
-                domain: [0.75, 1],  // Height for candlestick panel
-                anchor: 'x'
-            },
-            yaxis2: {
-                title: 'Oscillator',
-                domain: [0.5, 0.75],  // Height for K and D oscillator panel
+                domain: [0.5, 1],  // Height for candlestick panel
                 anchor: 'x'
             },
             yaxis3: {
+                title: 'Oscillator',
+                domain: [0.2, 0.45],  // Height for K and D oscillator panel
+                anchor: 'x'
+            },
+            yaxis2: {
                 title: 'Volume',
-                domain: [0, 0.2],  // Height for volume panel
+                domain: [0, 0.19],  // Height for volume panel
                 anchor: 'x'
             },
             showlegend: true,
