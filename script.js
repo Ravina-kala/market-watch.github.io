@@ -1,32 +1,34 @@
 let data;
 
-// Fetch the JSON data from the GitHub repo
+// Function to update message on the screen
+function displayMessage(message) {
+    const messageDiv = document.getElementById("message");
+    messageDiv.innerHTML = message;
+}
+
 fetch('data_1d.json')
     .then(response => response.json())
     .then(jsonData => {
         data = jsonData;
-        console.log("Data successfully loaded from JSON.");
+        displayMessage("Data successfully loaded from JSON.");
     })
-    .catch(error => console.error('Error loading JSON:', error));
+    .catch(error => displayMessage('Error loading JSON: ' + error));
 
 function plotGraph() {
     const tick = document.getElementById("search-box").value.trim();
 
     if (!tick) {
-        console.log("No tick entered.");
-        alert("Please enter a tick.");
+        displayMessage("Please enter a tick.");
         return;
     }
 
     if (tick in data) {
-        console.log(`Data found for tick: ${tick}`);
         const tickData = data[tick];
+        displayMessage(`Data found for tick: ${tick}`);
 
         // Extract the necessary data for plotting
         const dates = tickData.map(entry => entry.Datetime);
         const prices = tickData.map(entry => entry.Close);
-
-        console.log(`Found ${dates.length} data points for ${tick}.`);
 
         // Plotly graph
         var trace = {
@@ -43,9 +45,8 @@ function plotGraph() {
         };
 
         Plotly.newPlot('plot', [trace], layout);
-        console.log(`Plot created successfully for ${tick}.`);
+        displayMessage(`Plot created successfully for ${tick}.`);
     } else {
-        console.log(`No data found for tick: ${tick}`);
-        alert("Tick not found in the dataset.");
+        displayMessage(`No data found for tick: ${tick}`);
     }
 }
