@@ -114,15 +114,32 @@ function plotGraph() {
         // Layout for the chart
         const layout = {
             title: `Stock Data for ${tick}`,
-            grid: { rows: 3, columns: 1, pattern: 'independent' },
+            grid: {
+                rows: 3,
+                columns: 1,
+                pattern: 'independent',
+                roworder: 'top to bottom'
+            },
             xaxis: {
                 type: 'category',
                 rangeslider: { visible: false },  // Disable the date slider
                 showticklabels: false,  // Remove date labels on the x-axis
             },
-            yaxis: { title: 'Price' },  // y-axis for candlestick
-            yaxis2: { title: 'Oscillator', overlaying: 'y', side: 'right', position: 0.85 },  // y-axis for K and D
-            yaxis3: { title: 'Volume', domain: [0, 0.2], showticklabels: true },  // y-axis for Volume (separate)
+            yaxis1: {
+                title: 'Price',
+                domain: [0.75, 1],  // Height for candlestick panel
+                anchor: 'x'
+            },
+            yaxis2: {
+                title: 'Oscillator',
+                domain: [0.5, 0.75],  // Height for K and D oscillator panel
+                anchor: 'x'
+            },
+            yaxis3: {
+                title: 'Volume',
+                domain: [0, 0.2],  // Height for volume panel
+                anchor: 'x'
+            },
             showlegend: true,
             hovermode: 'x',  // Enable hovermode for dates to be shown only on hover
         };
