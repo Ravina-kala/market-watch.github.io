@@ -138,8 +138,8 @@ function plotGraph() {
                 
                 autorange: true,
                 rangeslider: { visible: true },  // Disable the date slider
-                range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
-                showticklabels: false,  // Remove date labels on the x-axis
+                // range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
+                showticklabels: true,  // Remove date labels on the x-axis
             },
             yaxis1: {
                 title: 'Price',
@@ -210,8 +210,12 @@ myPlot.on('plotly_relayout', function(relayoutData){
       var high = Math.max.apply(null, myPlot.data[0].high.slice(xstart, xend));
     }
 
-    // Update the yaxis range and set flag to false
-    var update = {'yaxis.range': [low, high]};
+    // Calculate padding based on current zoom level
+    var zoomLevel = (end - start) / (myPlot.data[0].x[myPlot.data[0].x.length - 1] - myPlot.data[0].x[0]);
+    var padding = (high - low) * 0.1 * zoomLevel; // Adjust padding factor as needed
+
+    // Update the yaxis range with padding
+    var update = {'yaxis.range': [low - padding, high + padding]};
     Plotly.relayout(myPlot, update).then(() => {isUnderRelayout = false});
   }
 });
