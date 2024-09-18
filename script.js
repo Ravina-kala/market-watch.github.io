@@ -134,23 +134,27 @@ function plotGraph() {
                 roworder: 'top to bottom'
             },
             xaxis: {
-                type: 'category',
+                
+                autorange: true,
                 rangeslider: { visible: true },  // Disable the date slider
                 range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
                 showticklabels: false,  // Remove date labels on the x-axis
             },
             yaxis1: {
                 title: 'Price',
+                autorange: true,
                 domain: [0.5, 1],  // Height for candlestick panel
                 anchor: 'x'
             },
             yaxis3: {
                 title: 'Oscillator',
+                autorange: true,
                 domain: [0.2, 0.45],  // Height for K and D oscillator panel
                 anchor: 'x'
             },
             yaxis2: {
                 title: 'Volume',
+                autorange: true,
                 domain: [0, 0.19],  // Height for volume panel
                 anchor: 'x'
             },
