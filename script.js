@@ -39,7 +39,11 @@ function plotGraph() {
         displayMessage(`Data found for tick: ${tick}`);
 
         // Extract the necessary data
-        const dates = tickData.map(entry => entry.Datetime);
+        const dates = tickData.map(entry => {
+  // Assuming the Datetime field is a string
+  return new Date(entry.Datetime).toISOString().slice(0, 10);
+});
+
         const opens = tickData.map(entry => entry.Open);
         const highs = tickData.map(entry => entry.High);
         const lows = tickData.map(entry => entry.Low);
