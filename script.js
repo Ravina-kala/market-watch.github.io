@@ -184,8 +184,8 @@ myPlot.on('plotly_relayout', function(relayoutData){
     var end = relayoutData['xaxis.range'][1];
 
     // Handle date format (assuming ISO 8601 format with timezone)
-    start = new Date(start).toISOString().slice(0, 10); // Extract YYYY-MM-DD
-    end = new Date(end).toISOString().slice(0, 10); // Extract YYYY-MM-DD
+    start = new Date(start).slice(0, 10); // Extract YYYY-MM-DD
+    end = new Date(end).slice(0, 10); // Extract YYYY-MM-DD
 
     // Get the index of the start and end dates (assuming dates are unique)
     var xstart = myPlot.data[0].x.indexOf(start);
