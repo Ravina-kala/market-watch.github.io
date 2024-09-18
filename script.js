@@ -135,9 +135,9 @@ function plotGraph() {
             },
             xaxis: {
                 type: 'category',
-                rangeslider: { visible: true },
+                rangeslider: { visible: true },  // Disable the date slider
                 range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
-                showticklabels: false,
+                showticklabels: false,  // Remove date labels on the x-axis
             },
             yaxis1: {
                 title: 'Price',
@@ -155,27 +155,11 @@ function plotGraph() {
                 anchor: 'x'
             },
             showlegend: true,
-            hovermode: 'x',
+            hovermode: 'x',  // Enable hovermode for dates to be shown only on hover
         };
 
         // Plot the chart
         Plotly.newPlot('plot', [candlestick, k_trace, d_trace, volume_trace, buy_signal_trace, sell_signal_trace], layout);
-
-        // Autosize function
-        function autosizePlot() {
-            const plotDiv = document.getElementById('plot');
-            plotDiv.style.width = '100%';
-            plotDiv.style.height = '100%';
-            Plotly.relayout(plotDiv, {
-                'xaxis.range': [dates[dates.length - 50], dates[dates.length - 1]]
-            });
-        }
-
-        // Event listener for range slider
-        document.getElementById('plot').on('plotly_relayout', function(eventData) {
-            autosizePlot();
-        });
-
         displayMessage(`Plot created successfully for ${tick}.`);
     } else {
         displayMessage(`No data found for tick: ${tick}`);
