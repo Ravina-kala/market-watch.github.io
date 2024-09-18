@@ -97,7 +97,7 @@ function plotGraph() {
         // Buy/Sell signals (arrows)
         const buy_signal_trace = {
             x: dates.filter((_, i) => signals[i] === 'Buy'),
-            y: lows.filter((_, i) => signals[i] === 'Buy'),
+            y: lows.filter((_, i) => signals[i] === 'Buy').map(low => low * 0.98),
             mode: 'markers',
             name: 'Buy Signal',
             marker: {
@@ -111,7 +111,7 @@ function plotGraph() {
 
         const sell_signal_trace = {
             x: dates.filter((_, i) => signals[i] === 'Sell'),
-            y: highs.filter((_, i) => signals[i] === 'Sell'),
+            y: highs.filter((_, i) => signals[i] === 'Sell').map(high => high * 1.02),
             mode: 'markers',
             name: 'Sell Signal',
             marker: {
@@ -135,7 +135,7 @@ function plotGraph() {
             },
             xaxis: {
                 type: 'category',
-                rangeslider: { visible: false },  // Disable the date slider
+                rangeslider: { visible: true },  // Disable the date slider
                 showticklabels: false,  // Remove date labels on the x-axis
             },
             yaxis1: {
