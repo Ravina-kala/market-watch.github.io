@@ -136,6 +136,7 @@ function plotGraph() {
             xaxis: {
                 type: 'category',
                 rangeslider: { visible: true },  // Disable the date slider
+                range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
                 showticklabels: false,  // Remove date labels on the x-axis
             },
             yaxis1: {
