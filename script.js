@@ -184,7 +184,10 @@ myPlot.on('plotly_relayout',function(relayoutData){
 			// get the start and end dates of current 'view'
 			var start = relayoutData['xaxis.range'][0];
 			var end = relayoutData['xaxis.range'][1];	
-			
+			// Handle date format (assuming ISO 8601 format with timezone)
+		        start = new Date(start).toISOString().slice(0, 10); // Extract YYYY-MM-DD
+		        end = new Date(end).toISOString().slice(0, 10); // Extract YYYY-MM-DD
+
 			// get the index of the start and end dates
 			var xstart = myPlot.data[0].x.map(function(e) { return e; }).indexOf(start.substring(0, 10));
 			var xend = myPlot.data[0].x.map(function(e) { return e; }).indexOf(end.substring(0, 10));
