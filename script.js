@@ -138,8 +138,8 @@ function plotGraph() {
                 
                 autorange: true,
                 rangeslider: { visible: true },  // Disable the date slider
-                // range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
-                showticklabels: true,  // Remove date labels on the x-axis
+                range: [dates[dates.length - 50], dates[dates.length - 1]],  // Initial fixed range (last 50 dates)
+                showticklabels: false,  // Remove date labels on the x-axis
             },
             yaxis1: {
                 title: 'Price',
@@ -175,47 +175,28 @@ function plotGraph() {
 var myPlot = document.getElementById('plot');
 
 var isUnderRelayout = false;
-myPlot.on('plotly_relayout', function(relayoutData){
-  if(isUnderRelayout != true) {
-    isUnderRelayout = true;
-
-    // Get the start and end dates of current 'view'
-    var start = relayoutData['xaxis.range'][0];
-    var end = relayoutData['xaxis.range'][1];
-
-    // Handle date format based on your data structure (modify as needed)
-    if (typeof start === 'string' && start.length >= 10) {
-      start = start.substring(0, 10);
-    }
-    if (typeof end === 'string' && end.length >= 10) {
-      end = end.substring(0, 10);
-    }
-
-    // Get the index of the start and end dates (assuming dates are unique)
-    var xstart = myPlot.data[0].x.indexOf(start);
-    var xend = myPlot.data[0].x.indexOf(end);
-
-    // Handle cases where dates might not be present in the data
-    if (xstart < 0) { xstart = 0; }
-    if (xend < 0) { xend = myPlot.data[0].x.length - 1; } // Assuming end date is not beyond data
-
-    // Get the min and max using d3.extent (if d3 is available)
-    if (typeof d3 !== 'undefined') {
-      var extent = d3.extent(myPlot.data[0].low.slice(xstart, xend));
-      var low = extent[0];
-      var high = extent[1];
-    } else {
-      // Fallback using Math.min and Math.max (less efficient)
-      var low = Math.min.apply(null, myPlot.data[0].low.slice(xstart, xend));
-      var high = Math.max.apply(null, myPlot.data[0].high.slice(xstart, xend));
-    }
-
-    // Calculate padding based on current zoom level
-    var zoomLevel = (end - start) / (myPlot.data[0].x[myPlot.data[0].x.length - 1] - myPlot.data[0].x[0]);
-    var padding = (high - low) * 0.1 * zoomLevel; // Adjust padding factor as needed
-
-    // Update the yaxis range with padding
-    var update = {'yaxis.range': [low - padding, high + padding]};
-    Plotly.relayout(myPlot, update).then(() => {isUnderRelayout = false});
-  }
+myPlot.on('plotly_relayout',function(relayoutData){
+   
+	if(isUnderRelayout != true)
+		{
+			isUnderRelayout = true;			
+			
+			// get the start and end dates of current 'view'
+			var start = relayoutData['xaxis.range'][0];
+			var end = relayoutData['xaxis.range'][1];	
+			
+			// get the index of the start and end dates
+			var xstart = myPlot.data[0].x.map(function(e) { return e; }).indexOf(start.substring(0, 10));
+			var xend = myPlot.data[0].x.map(function(e) { return e; }).indexOf(end.substring(0, 10));
+			
+			if (xstart < 0) { xstart = 0;} // sometimes the date is before the data and returns -1			
+						
+			// get the min and max's
+			var low = Math.min.apply(null, myPlot.data[0].low.slice(xstart, xend));
+			var high = Math.max.apply(null, myPlot.data[0].high.slice(xstart, xend));
+			
+			// update the yaxis range and set flag to false
+			var update = {'yaxis.range': [low, high]};	
+			Plotly.relayout(myPlot, update).then(() => {isUnderRelayout = false})	
+		}
 });
