@@ -127,6 +127,7 @@ function plotGraph() {
         const layout = {
             title: `Stock Data for ${tick}`,
             height: 800,
+		dragmode: 'zoom',
             grid: {
                 rows: 3,
                 columns: 1,
