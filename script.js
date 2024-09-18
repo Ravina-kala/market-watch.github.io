@@ -1,4 +1,4 @@
-let data;
+let data = {};
 
 // Function to update message on the screen
 function displayMessage(message) {
@@ -6,13 +6,25 @@ function displayMessage(message) {
     messageDiv.innerHTML = message;
 }
 
-fetch('data_1d.json')
-    .then(response => response.json())
-    .then(jsonData => {
-        data = jsonData;
-        displayMessage("Data successfully loaded from JSON.");
-    })
-    .catch(error => displayMessage('Error loading JSON: ' + error));
+// Function to load and merge multiple JSON files
+function loadData() {
+    const jsonFiles = ['data_1d_part_1.json', 'data_1d_part_2.json', 'data_1d_part_3.json', 'data_1d_part_4.json'];
+
+    const fetchPromises = jsonFiles.map(file => fetch(file).then(response => response.json()));
+
+    Promise.all(fetchPromises)
+        .then(jsonParts => {
+            // Merge all parts into the 'data' object
+            jsonParts.forEach(part => {
+                Object.assign(data, part);
+            });
+            displayMessage("All data successfully loaded from JSON files.");
+        })
+        .catch(error => displayMessage('Error loading JSON files: ' + error));
+}
+
+// Call loadData when the page loads
+window.onload = loadData;
 
 function plotGraph() {
     const tick = document.getElementById("search-box").value.trim();
@@ -114,7 +126,6 @@ function plotGraph() {
         // Layout for the chart
         const layout = {
             title: `Stock Data for ${tick}`,
-            // width: 800,
             height: 800,
             grid: {
                 rows: 3,
