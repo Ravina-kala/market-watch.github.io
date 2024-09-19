@@ -104,9 +104,8 @@ function plotGraph() {
 
         // Find missing dates
         const missingDates = findMissingDates(tick);
-        const rangebreaks = missingDates.map(date => ({ bounds: [date, date] }));
-        displayMessage(missingDates)
-        displayMessage(rangebreaks)
+        const rangebreaks = missingDates.map(date => ({ values: missingDates }));
+        
         // Extract candlestick data
         const dates = tickData.map(entry => entry.Datetime.slice(0, 10)); // Use YYYY-MM-DD
         const opens = tickData.map(entry => entry.Open);
