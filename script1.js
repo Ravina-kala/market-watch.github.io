@@ -204,7 +204,7 @@ function plotGraph() {
                     xaxis: {
                         autorange: true,
                         rangeslider: { visible: true, range: [firstDate, lastDate] },
-                        rangebreaks: missingDates.map(date => ({ d: date })),
+                        rangebreaks: missingDates.map(date => ({ values: [date] })),
                         title: 'Date'
                     },
                     yaxis1: {
