@@ -62,34 +62,7 @@ function displayMessage(message) {
     const messageDiv = document.getElementById("message");
     messageDiv.innerHTML = message;
 }
-function findMissingDates(tick) {
-    if (!(tick in data)) {
-        displayMessage(`No data found for tick: ${tick}`);
-        return [];
-    }
 
-    const tickData = data[tick];
-    const dates = tickData.map(entry => new Date(entry.Datetime).toISOString().split('T')[0]);
-
-    // Determine the full range of dates
-    const minDate = new Date(Math.min(...dates.map(date => new Date(date))));
-    const maxDate = new Date(Math.max(...dates.map(date => new Date(date))));
-
-    const allDates = [];
-    const currentDate = new Date(minDate);
-
-    while (currentDate <= maxDate) {
-        allDates.push(currentDate.toISOString().split('T')[0]);
-        currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    // Find missing dates
-    const missingDates = allDates.filter(date => !dates.includes(date));
-
-    return missingDates;
-}
-
-// Function to plot candlestick data
 function plotGraph() {
     const tick = document.getElementById("search-box").value.trim();
 
@@ -102,10 +75,6 @@ function plotGraph() {
         const tickData = data[tick];
         displayMessage(`Data found for tick: ${tick}`);
 
-        // Find missing dates
-        const missingDates = findMissingDates(tick);
-        const rangebreaks = missingDates.map(date => ({ values: missingDates }));
-        
         // Extract candlestick data
         const dates = tickData.map(entry => entry.Datetime.slice(0, 10)); // Use YYYY-MM-DD
         const opens = tickData.map(entry => entry.Open);
@@ -121,177 +90,181 @@ function plotGraph() {
         const firstDate = dates[0];
         const lastDate = dates[dates.length - 1];
 
-        // Candlestick data
-        var candlestick = {
-            x: dates,
-            open: opens,
-            high: highs,
-            low: lows,
-            close: closes,
-            type: 'candlestick',
-            name: 'Price',
-            xaxis: 'x',
-            yaxis: 'y1',
-            increasing: {line: {color: '#17BECF'}},
-            decreasing: {line: {color: '#7F7F7F'}}
-        };
-        
-        // Volume bar chart trace
-        var volume_trace = {
-            x: dates,
-            y: volumes,
-            type: 'bar',
-            name: 'Volume',
-            marker: { color: 'rgba(100, 150, 250, 0.4)' },
-            xaxis: 'x',
-            yaxis: 'y2'
-        };
-        
-        // K and D oscillator traces
-        var k_trace = {
-            x: dates,
-            y: k_values,
-            mode: 'lines',
-            name: 'K',
-            line: { color: 'blue' },
-            xaxis: 'x',
-            yaxis: 'y3'
-        };
-        
-        var d_trace = {
-            x: dates,
-            y: d_values,
-            mode: 'lines',
-            name: 'D',
-            line: { color: 'orange' },
-            xaxis: 'x',
-            yaxis: 'y3'
-        };
-        
-        // Buy/Sell signals (arrows)
-        var buy_signal_trace = {
-            x: dates.filter((_, i) => signals[i] === 'Buy'),
-            y: lows.filter((_, i) => signals[i] === 'Buy').map(low => low * 0.98),  // Slightly below the low
-            mode: 'markers',
-            name: 'Buy Signal',
-            marker: {
-                symbol: 'triangle-up',
-                color: 'green',
-                size: 12
-            },
-            xaxis: 'x',
-            yaxis: 'y1'
-        };
-        
-        var sell_signal_trace = {
-            x: dates.filter((_, i) => signals[i] === 'Sell'),
-            y: highs.filter((_, i) => signals[i] === 'Sell').map(high => high * 1.02),  // Slightly above the high
-            mode: 'markers',
-            name: 'Sell Signal',
-            marker: {
-                symbol: 'triangle-down',
-                color: 'red',
-                size: 12
-            },
-            xaxis: 'x',
-            yaxis: 'y1'
-        };
-        
-        // Overbought and Oversold lines (for the K and D Oscillator)
-        var ob_line = {
-            x: dates,
-            y: Array(dates.length).fill(80),
-            mode: 'lines',
-            name: 'Overbought (80)',
-            line: { color: 'red', dash: 'dash' },
-            xaxis: 'x',
-            yaxis: 'y3'
-        };
-        
-        var os_line = {
-            x: dates,
-            y: Array(dates.length).fill(20),
-            mode: 'lines',
-            name: 'Oversold (20)',
-            line: { color: 'green', dash: 'dash' },
-            xaxis: 'x',
-            yaxis: 'y3'
-        };
-        
-        // Layout for the chart
-        var layout = {
-            title: `Stock Data for ${tick}`,
-            height: 900,
-            grid: {
-                rows: 3,
-                columns: 1,
-                pattern: 'independent',
-                roworder: 'top to bottom'
-            },
-            xaxis: {
-                // type: 'category',
-                autorange: true,
-                rangeslider: { visible: true, range: [dates[0], dates[dates.length - 1]] },
-                rangebreaks: rangebreaks,
-                // showticklabels: false,
-                title: 'Date'
-            },
-            yaxis1: {
-                title: 'Price',
-                domain: [0.55, 1],  // Adjusted height for candlestick panel
-                autorange: true,
-                anchor: 'x'
-            },
-            yaxis2: {
-                title: 'Volume',
-                domain: [0.35, 0.5],  // Adjusted height for volume panel
-                autorange: true,
-                anchor: 'x'
-            },
-            yaxis3: {
-                title: 'Oscillator',
-                domain: [0, 0.3],  // Adjusted height for K and D oscillator panel
-                autorange: true,
-                anchor: 'x'
-            },
-            showlegend: true,
-            hovermode: 'x',
-        };
-
-        // Plot the chart
-        Plotly.newPlot('plot', [candlestick, volume_trace, k_trace, d_trace, buy_signal_trace, sell_signal_trace, ob_line, os_line], layout, {showSendToCloud: true});
-
-
-        // Set up relayout event for auto-scaling on zoom, pan, or rangeslider move
-        var myPlot = document.getElementById('plot');
-        var isUnderRelayout = false;
-
-        myPlot.on('plotly_relayout', function (relayoutData) {
-            if (isUnderRelayout !== true) {
-                isUnderRelayout = true;
-
-                // Get the start and end dates from the current view or rangeslider
-                var start = relayoutData['xaxis.range'] ? relayoutData['xaxis.range'][0].slice(0, 10) : firstDate;
-                var end = relayoutData['xaxis.range'] ? relayoutData['xaxis.range'][1].slice(0, 10) : lastDate;
-
-                // Get the index range
-                var xstart = myPlot.data[0].x.indexOf(start);
-                var xend = myPlot.data[0].x.indexOf(end);
+        // Load missing dates and plot the chart
+        fetch('missing_dates.json')
+            .then(response => response.json())
+            .then(missingDates => {
+                // Candlestick data
+                var candlestick = {
+                    x: dates,
+                    open: opens,
+                    high: highs,
+                    low: lows,
+                    close: closes,
+                    type: 'candlestick',
+                    name: 'Price',
+                    xaxis: 'x',
+                    yaxis: 'y1',
+                    increasing: {line: {color: '#17BECF'}},
+                    decreasing: {line: {color: '#7F7F7F'}}
+                };
                 
-                if (xstart < 0) { xstart = 0; }
-                if (xend < 0) { xend = myPlot.data[0].x.length - 1; }
+                // Volume bar chart trace
+                var volume_trace = {
+                    x: dates,
+                    y: volumes,
+                    type: 'bar',
+                    name: 'Volume',
+                    marker: { color: 'rgba(100, 150, 250, 0.4)' },
+                    xaxis: 'x',
+                    yaxis: 'y2'
+                };
+                
+                // K and D oscillator traces
+                var k_trace = {
+                    x: dates,
+                    y: k_values,
+                    mode: 'lines',
+                    name: 'K',
+                    line: { color: 'blue' },
+                    xaxis: 'x',
+                    yaxis: 'y3'
+                };
+                
+                var d_trace = {
+                    x: dates,
+                    y: d_values,
+                    mode: 'lines',
+                    name: 'D',
+                    line: { color: 'orange' },
+                    xaxis: 'x',
+                    yaxis: 'y3'
+                };
+                
+                // Buy/Sell signals (arrows)
+                var buy_signal_trace = {
+                    x: dates.filter((_, i) => signals[i] === 'Buy'),
+                    y: lows.filter((_, i) => signals[i] === 'Buy').map(low => low * 0.98),  // Slightly below the low
+                    mode: 'markers',
+                    name: 'Buy Signal',
+                    marker: {
+                        symbol: 'triangle-up',
+                        color: 'green',
+                        size: 12
+                    },
+                    xaxis: 'x',
+                    yaxis: 'y1'
+                };
+                
+                var sell_signal_trace = {
+                    x: dates.filter((_, i) => signals[i] === 'Sell'),
+                    y: highs.filter((_, i) => signals[i] === 'Sell').map(high => high * 1.02),  // Slightly above the high
+                    mode: 'markers',
+                    name: 'Sell Signal',
+                    marker: {
+                        symbol: 'triangle-down',
+                        color: 'red',
+                        size: 12
+                    },
+                    xaxis: 'x',
+                    yaxis: 'y1'
+                };
+                
+                // Overbought and Oversold lines (for the K and D Oscillator)
+                var ob_line = {
+                    x: dates,
+                    y: Array(dates.length).fill(80),
+                    mode: 'lines',
+                    name: 'Overbought (80)',
+                    line: { color: 'red', dash: 'dash' },
+                    xaxis: 'x',
+                    yaxis: 'y3'
+                };
+                
+                var os_line = {
+                    x: dates,
+                    y: Array(dates.length).fill(20),
+                    mode: 'lines',
+                    name: 'Oversold (20)',
+                    line: { color: 'green', dash: 'dash' },
+                    xaxis: 'x',
+                    yaxis: 'y3'
+                };
+                
+                // Layout for the chart
+                var layout = {
+                    title: `Stock Data for ${tick}`,
+                    height: 900,
+                    grid: {
+                        rows: 3,
+                        columns: 1,
+                        pattern: 'independent',
+                        roworder: 'top to bottom'
+                    },
+                    xaxis: {
+                        autorange: true,
+                        rangeslider: { visible: true, range: [firstDate, lastDate] },
+                        rangebreaks: missingDates.map(date => ({ d: date })),
+                        title: 'Date'
+                    },
+                    yaxis1: {
+                        title: 'Price',
+                        domain: [0.55, 1],  // Adjusted height for candlestick panel
+                        autorange: true,
+                        anchor: 'x'
+                    },
+                    yaxis2: {
+                        title: 'Volume',
+                        domain: [0.35, 0.5],  // Adjusted height for volume panel
+                        autorange: true,
+                        anchor: 'x'
+                    },
+                    yaxis3: {
+                        title: 'Oscillator',
+                        domain: [0, 0.3],  // Adjusted height for K and D oscillator panel
+                        autorange: true,
+                        anchor: 'x'
+                    },
+                    showlegend: true,
+                    hovermode: 'x',
+                };
 
-                // Find the min and max values in the visible range
-                var low = Math.min.apply(null, myPlot.data[0].low.slice(xstart, xend));
-                var high = Math.max.apply(null, myPlot.data[0].high.slice(xstart, xend));
+                // Plot the chart
+                Plotly.newPlot('plot', [candlestick, volume_trace, k_trace, d_trace, buy_signal_trace, sell_signal_trace, ob_line, os_line], layout, {showSendToCloud: true});
 
-                // Update the Y-axis range
-                var update = {'yaxis.range': [low, high]};
-                Plotly.relayout(myPlot, update).then(() => { isUnderRelayout = false; });
-            }
-        });
+                // Set up relayout event for auto-scaling on zoom, pan, or rangeslider move
+                var myPlot = document.getElementById('plot');
+                var isUnderRelayout = false;
+
+                myPlot.on('plotly_relayout', function (relayoutData) {
+                    if (isUnderRelayout !== true) {
+                        isUnderRelayout = true;
+
+                        // Get the start and end dates from the current view or rangeslider
+                        var start = relayoutData['xaxis.range'] ? relayoutData['xaxis.range'][0].slice(0, 10) : firstDate;
+                        var end = relayoutData['xaxis.range'] ? relayoutData['xaxis.range'][1].slice(0, 10) : lastDate;
+
+                        // Get the index range
+                        var xstart = myPlot.data[0].x.indexOf(start);
+                        var xend = myPlot.data[0].x.indexOf(end);
+                        
+                        if (xstart < 0) { xstart = 0; }
+                        if (xend < 0) { xend = myPlot.data[0].x.length - 1; }
+
+                        // Find the min and max values in the visible range
+                        var low = Math.min.apply(null, myPlot.data[0].low.slice(xstart, xend));
+                        var high = Math.max.apply(null, myPlot.data[0].high.slice(xstart, xend));
+
+                        // Update the Y-axis range
+                        var update = {'yaxis.range': [low, high]};
+                        Plotly.relayout(myPlot, update).then(() => { isUnderRelayout = false; });
+                    }
+                });
+
+            })
+            .catch(error => displayMessage('Error fetching missing dates: ' + error));
 
     } else {
         displayMessage(`No data found for tick: ${tick}`);
     }
-};
+}
