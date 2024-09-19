@@ -62,6 +62,32 @@ function displayMessage(message) {
     const messageDiv = document.getElementById("message");
     messageDiv.innerHTML = message;
 }
+function findMissingDates(tick) {
+    if (!(tick in data)) {
+        displayMessage(`No data found for tick: ${tick}`);
+        return [];
+    }
+
+    const tickData = data[tick];
+    const dates = tickData.map(entry => new Date(entry.Datetime).toISOString().split('T')[0]);
+
+    // Determine the full range of dates
+    const minDate = new Date(Math.min(...dates.map(date => new Date(date))));
+    const maxDate = new Date(Math.max(...dates.map(date => new Date(date))));
+
+    const allDates = [];
+    const currentDate = new Date(minDate);
+
+    while (currentDate <= maxDate) {
+        allDates.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // Find missing dates
+    const missingDates = allDates.filter(date => !dates.includes(date));
+
+    return missingDates;
+}
 
 // Function to plot candlestick data
 function plotGraph() {
@@ -76,6 +102,10 @@ function plotGraph() {
         const tickData = data[tick];
         displayMessage(`Data found for tick: ${tick}`);
 
+        // Find missing dates
+        const missingDates = findMissingDates(tick);
+        const rangebreaks = missingDates.map(date => ({ bounds: [date, date] }));
+        
         // Extract candlestick data
         const dates = tickData.map(entry => entry.Datetime.slice(0, 10)); // Use YYYY-MM-DD
         const opens = tickData.map(entry => entry.Open);
@@ -101,7 +131,9 @@ function plotGraph() {
             type: 'candlestick',
             name: 'Price',
             xaxis: 'x',
-            yaxis: 'y1'
+            yaxis: 'y1',
+            increasing: {line: {color: '#17BECF'}},
+            decreasing: {line: {color: '#7F7F7F'}}
         };
         
         // Volume bar chart trace
@@ -199,6 +231,7 @@ function plotGraph() {
             xaxis: {
                 autorange: true,
                 rangeslider: { visible: true, range: [dates[0], dates[dates.length - 1]] },
+                rangebreaks: rangebreaks,
                 title: 'Date'
             },
             yaxis1: {
