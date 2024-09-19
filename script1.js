@@ -126,10 +126,10 @@ function plotGraph() {
         };
 
         // Plot the candlestick chart
-        Plotly.newPlot('plotly-div', [trace1], layout, {showSendToCloud: true});
+        Plotly.newPlot('plot', [trace1], layout, {showSendToCloud: true});
 
         // Set up relayout event for auto-scaling on zoom, pan, or rangeslider move
-        var myPlot = document.getElementById('plotly-div');
+        var myPlot = document.getElementById('plot');
         var isUnderRelayout = false;
 
         myPlot.on('plotly_relayout', function (relayoutData) {
