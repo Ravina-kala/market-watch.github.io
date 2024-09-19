@@ -82,6 +82,10 @@ function plotGraph() {
         const highs = tickData.map(entry => entry.High);
         const lows = tickData.map(entry => entry.Low);
         const closes = tickData.map(entry => entry.Close);
+        const volumes = tickData.map(entry => entry.Volume);
+        const d_values = tickData.map(entry => entry.k);
+        const k_values = tickData.map(entry => entry.d);
+        const signals = tickData.map(entry => entry.signal);
 
         // Get first and last date for setting X-axis range
         const firstDate = dates[0];
