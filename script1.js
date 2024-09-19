@@ -230,11 +230,11 @@ function plotGraph() {
                 roworder: 'top to bottom'
             },
             xaxis: {
-                type: 'category',
+                // type: 'category',
                 autorange: true,
                 rangeslider: { visible: true, range: [dates[0], dates[dates.length - 1]] },
                 rangebreaks: rangebreaks,
-                showticklabels: false,
+                // showticklabels: false,
                 title: 'Date'
             },
             yaxis1: {
